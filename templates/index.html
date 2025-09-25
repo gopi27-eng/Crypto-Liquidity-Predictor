@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Liquidity Predictor</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a2e;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .card {
+            background-color: #162447;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 flex items-center justify-center min-h-screen p-4">
+
+    <div class="card p-8 sm:p-12 w-full max-w-2xl mx-auto space-y-8">
+        <h1 class="text-3xl sm:text-4xl font-bold text-center text-white">Crypto Liquidity Predictor</h1>
+        <p class="text-center text-gray-400 mt-2">
+            Enter the cryptocurrency details to predict its liquidity ratio.
+        </p>
+
+        <form id="predictionForm" class="space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                    <label for="symbol" class="block text-sm font-medium text-gray-300">Symbol (e.g., BTC, ETH)</label>
+                    <input type="text" id="symbol" name="Symbol" required class="mt-1 block w-full px-4 py-2 bg-gray-700 text-white rounded-md border-gray-600 focus:ring-purple-500 focus:border-purple-500 shadow-sm">
+                </div>
+                <div>
+                    <label for="price" class="block text-sm font-medium text-gray-300">Price</label>
+                    <input type="number" step="0.01" id="price" name="Price" required class="mt-1 block w-full px-4 py-2 bg-gray-700 text-white rounded-md border-gray-600 focus:ring-purple-500 focus:border-purple-500 shadow-sm">
+                </div>
+                <div>
+                    <label for="price_1h" class="block text-sm font-medium text-gray-300">1h Price Change</label>
+                    <input type="number" step="0.01" id="price_1h" name="1h Price Change" required class="mt-1 block w-full px-4 py-2 bg-gray-700 text-white rounded-md border-gray-600 focus:ring-purple-500 focus:border-purple-500 shadow-sm">
+                </div>
+                <div>
+                    <label for="price_24h" class="block text-sm font-medium text-gray-300">24h Price Change</label>
+                    <input type="number" step="0.01" id="price_24h" name="24h Price Change" required class="mt-1 block w-full px-4 py-2 bg-gray-700 text-white rounded-md border-gray-600 focus:ring-purple-500 focus:border-purple-500 shadow-sm">
+                </div>
+                <div>
+                    <label for="price_7d" class="block text-sm font-medium text-gray-300">7d Price Change</label>
+                    <input type="number" step="0.01" id="price_7d" name="7d Price Change" required class="mt-1 block w-full px-4 py-2 bg-gray-700 text-white rounded-md border-gray-600 focus:ring-purple-500 focus:border-purple-500 shadow-sm">
+                </div>
+                <div>
+                    <label for="volume_24h" class="block text-sm font-medium text-gray-300">24h Volume</label>
+                    <input type="number" id="volume_24h" name="24h Volume" required class="mt-1 block w-full px-4 py-2 bg-gray-700 text-white rounded-md border-gray-600 focus:ring-purple-500 focus:border-purple-500 shadow-sm">
+                </div>
+                <div>
+                    <label for="mkt_cap" class="block text-sm font-medium text-gray-300">Market Cap</label>
+                    <input type="number" id="mkt_cap" name="Market Cap" required class="mt-1 block w-full px-4 py-2 bg-gray-700 text-white rounded-md border-gray-600 focus:ring-purple-500 focus:border-purple-500 shadow-sm">
+                </div>
+            </div>
+            
+            <button type="submit" id="submitBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-md shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                Predict Liquidity Ratio
+            </button>
+        </form>
+
+        <div id="resultContainer" class="mt-8 hidden">
+            <div class="bg-gray-800 p-6 rounded-md shadow-inner text-center">
+                <p class="text-gray-300">Predicted Liquidity:</p>
+                <p id="predictionResult" class="text-3xl font-bold text-green-400 mt-2"></p>
+            </div>
+        </div>
+
+        <div id="loading" class="hidden text-center text-gray-400">
+            <p>Predicting... please wait.</p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('predictionForm');
+        const resultContainer = document.getElementById('resultContainer');
+        const predictionResult = document.getElementById('predictionResult');
+        const loading = document.getElementById('loading');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Show loading state
+            loading.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = isNaN(value) ? value : parseFloat(value);
+            });
+
+            // Use the correct API endpoint
+            const apiUrl = 'http://localhost:5000/predict';
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                // Update the UI with the prediction
+                if (result.prediction !== undefined) {
+                    predictionResult.textContent = result.prediction.toFixed(4); // Format to 4 decimal places
+                    predictionResult.classList.remove('text-red-400');
+                    predictionResult.classList.add('text-green-400');
+                } else if (result.error) {
+                    predictionResult.textContent = 'Error: ' + result.error;
+                    predictionResult.classList.remove('text-green-400');
+                    predictionResult.classList.add('text-red-400');
+                }
+
+                resultContainer.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error:', error);
+                predictionResult.textContent = 'Error: ' + error.message;
+                predictionResult.classList.remove('text-green-400');
+                predictionResult.classList.add('text-red-400');
+                resultContainer.classList.remove('hidden');
+            } finally {
+                // Hide loading and re-enable button
+                loading.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        });
+    </script>
+</body>
+</html>

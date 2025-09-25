@@ -1,0 +1,9 @@
+Ignore the specific file 'venu'
+venu
+
+Common files and directories to ignore
+.git
+.gitignore
+pycache
+*.pyc
+.env
