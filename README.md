@@ -1,129 +1,61 @@
-Cryptocurrency Liquidity Prediction API
-Project Description
-This project provides a robust, containerized API for predicting cryptocurrency liquidity based on historical and real-time market data. The core of the application is a machine learning model, specifically a Random Forest Regressor, trained to predict future liquidity values.
+Cryptocurrency Liquidity Predictor
+Project Overview
+This project presents a robust, machine learning-powered API for predicting cryptocurrency liquidity. It leverages a pre-trained Random Forest Regressor model to provide accurate liquidity forecasts based on key market indicators like price changes, volume, and market capitalization. The entire application is containerized with Docker, ensuring a portable, reproducible, and easily deployable solution for data scientists and developers.
 
-The entire application is packaged within a Docker container, ensuring a consistent and reproducible environment for deployment and scaling.
+Problem Statement
+Cryptocurrency markets are known for their high volatility, where liquidity—the ease of buying or selling assets without significant price impact—plays a crucial role in market stability. A lack of liquidity can lead to sharp price fluctuations and instability.
+
+This project addresses this by building a machine learning model to predict liquidity levels, helping traders and exchange platforms manage risks effectively by forecasting liquidity variations.
 
 Key Features
-Machine Learning Model: Utilizes a pre-trained scikit-learn Random Forest model for accurate liquidity prediction.
+Predictive API: A RESTful API built with Flask that accepts cryptocurrency data and returns a liquidity prediction.
 
-RESTful API: Provides a clean and accessible API endpoint (/predict) for making predictions.
+Containerization: The entire application, including all dependencies and models, is containerized using Docker for easy deployment and portability.
 
-Data Preprocessing: The API handles the necessary data encoding and transformation, allowing users to send raw categorical data directly.
+Machine Learning Model: Utilizes a Random Forest Regressor trained on historical market data.
 
-Dockerized Environment: The entire application runs inside a Docker container, simplifying setup and deployment.
+Tech Stack
+Language: Python
 
-Technologies
-Python: The core programming language.
+Framework: Flask
 
-Flask: A lightweight web framework for building the API.
+Libraries: scikit-learn, pandas, numpy
 
-scikit-learn: The machine learning library used for the model and preprocessing.
+Containerization: Docker
 
-Pandas & NumPy: Essential libraries for data manipulation.
+How to Run the Project
+This project is designed to be run easily using Docker. Follow these two simple steps to get the application up and running on your local machine.
 
-Docker: Used to package the application and its dependencies into a single, portable image.
-
-Getting Started
-To run this application, you must have Docker installed on your machine.
-
-Clone the Repository:
-
-git clone [https://github.com/your-username/your-project.git](https://github.com/your-username/your-project.git)
-cd your-project
-
-
-
-
-Verify Files: Ensure the project directory contains the following files and directories:
-
-app.py (The Flask application)
-
-Dockerfile (The build instructions for Docker)
-
-requirements.txt (List of Python dependencies)
-
-model/ (This directory should contain your Randomforest_Regression_model.pkl and encoder.pkl files)
-
-Build the Docker Image:
-From your terminal, navigate to the project's root directory and run the following command to build the Docker image.
+1. Build the Docker Image
+First, you need to build the Docker image from the provided Dockerfile. Open your terminal in the root directory of this project and run the following command:
 
 docker build -t crypto-predictor .
 
-
-
-
-Run the Docker Container:
-After the build is complete, run the container and map the internal port 5000 to your machine's port 5000.
+2. Run the Container
+Once the image is built, you can run the container and map the application's port to your local machine.
 
 docker run -p 5000:5000 crypto-predictor
 
-
-
-
-The Flask API should now be running and accessible at http://localhost:5000.
-
-API Endpoint
-The application exposes a single endpoint for predictions.
-
-POST /predict
-
-Description: Accepts a JSON payload of input features and returns a predicted liquidity value.
-
-Headers: Content-Type: application/json
-
-Request Body (JSON):
-
-{
-  "Time": 1715011200,
-  "Asset_ID": 1,
-  "Open": 29000.0,
-  "High": 30000.0,
-  "Low": 28500.0,
-  "Volume": 15000.0,
-  "Count": 5000,
-  "VWAP": 29250.0
-}
-
-
-
-
-Example curl command:
-
-curl -X POST -H "Content-Type: application/json" -d '{ "Time": 1715011200, "Asset_ID": 1, "Open": 29000.0, "High": 30000.0, "Low": 28500.0, "Volume": 15000.0, "Count": 5000, "VWAP": 29250.0 }' http://localhost:5000/predict
-
-
-
-
-Input Features
-The API endpoint expects a JSON payload with the following features:
-
-Time (Integer): The timestamp of the market data, in Unix time.
-
-Asset_ID (Integer): A unique identifier for the cryptocurrency asset.
-
-Open (Float): The opening price of the asset during a time window.
-
-High (Float): The highest price of the asset during a time window.
-
-Low (Float): The lowest price of the asset during a time window.
-
-Volume (Float): The total volume traded for the asset during a time window.
-
-Count (Integer): The number of trades for the asset during a time window.
-
-VWAP (Float): Volume-Weighted Average Price, which is the average price weighted by volume.
+The application will now be running at http://localhost:5000. You can interact with the API or use the provided index.html frontend to test the predictions.
 
 Project Structure
-crypto-predictor/
-├── app.py
-├── data/
-├── Dockerfile
-├── requirements.txt
-├── README.md
-├── scripts/
-└── notebooks/
-└── model/
-    ├── RandomForest_Regression_model.pkl
-    └── encoder.pkl
+app.py: The main Flask application that defines the API endpoints.
 
+models/: Contains the trained machine learning model (Randomforest_Regression_model.pkl) and the TargetEncoder.pkl for data preprocessing.
+
+data/: Includes the raw and preprocessed data used for training.
+
+templates/: The frontend HTML file (index.html) for interacting with the API.
+
+requirements.txt: Lists all the Python dependencies.
+
+Dockerfile: The instructions for building the Docker image.
+
+.dockerignore: Specifies files and folders to be excluded from the Docker build context.
+
+Future Enhancements
+Real-time Data: Integrate with a cryptocurrency exchange API to get real-time data for predictions.
+
+Improved Model: Explore other machine learning models or deep learning approaches (e.g., LSTMs) to improve prediction accuracy.
+
+Container Orchestration: Deploy the application using container orchestration tools like Kubernetes.
