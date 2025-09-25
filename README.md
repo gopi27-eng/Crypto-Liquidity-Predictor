@@ -1,3 +1,4 @@
+### 
 Cryptocurrency Liquidity Predictor
 Project Overview
 This project presents a robust, machine learning-powered API for predicting cryptocurrency liquidity. It leverages a pre-trained Random Forest Regressor model to provide accurate liquidity forecasts based on key market indicators like price changes, volume, and market capitalization. The entire application is containerized with Docker, ensuring a portable, reproducible, and easily deployable solution for data scientists and developers.
